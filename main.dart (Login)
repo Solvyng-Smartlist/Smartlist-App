@@ -1,0 +1,124 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool _rememberPassword = false;
+
+  void _onLoginPressed() {
+    // Perform the login logic here
+    // For now, let's just show a snackbar message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content:
+            Text('Login button pressed!'), // You can customize this message
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Login Screen'),
+        ),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Image.asset('assets/logo.png', width: 100, height: 100),
+            const Text(
+              'Lets get started',
+              style: TextStyle(
+                fontSize: 35,
+                color: Colors.green,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 50), // Adjust the horizontal padding here
+              child: TextFormField(
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  hintText: 'Enter email',
+                  prefixIcon: Icon(Icons.email),
+                  border: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green),
+                  ),
+                ),
+                onChanged: (String value) {},
+                validator: (value) {
+                  return value!.isEmpty ? 'Please enter email' : null;
+                },
+              ),
+            ),
+            const SizedBox(height: 30),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 50), // Adjust the horizontal padding here
+              child: TextFormField(
+                keyboardType: TextInputType.visiblePassword,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  hintText: 'Enter password',
+                  prefixIcon: Icon(Icons.password),
+                  border: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green),
+                  ),
+                ),
+                onChanged: (String value) {},
+                validator: (value) {
+                  return value!.isEmpty ? 'Please enter password' : null;
+                },
+              ),
+            ),
+            Row(
+              children: [
+                Checkbox(
+                  value: _rememberPassword,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      _rememberPassword = value!;
+                    });
+                  },
+                ),
+                Text('Remember Password'),
+              ],
+            ),
+            const SizedBox(height: 30),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 50), // Adjust the horizontal padding here
+              child: MaterialButton(
+                minWidth: double.infinity,
+                onPressed: _onLoginPressed, // Call the login functionality here
+                color: Colors.green,
+                textColor: Colors.white,
+                child: const Text('Login'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
