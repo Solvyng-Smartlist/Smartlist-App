@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:login_screen/screens/register_screen.dart';
+import 'package:login_screen/screens/reset_password.dart';
 import 'package:login_screen/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
 
 import '../provider/auth_provider.dart';
-import 'home_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -27,26 +27,26 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
-                  "assets/background_List.png",
+                  "assets/Grocery_bag.png",
                   height: 300,
                 ),
-                // const SizedBox(height: 20),
-                // const Text(
-                //   "Let's get started",
-                //   style: TextStyle(
-                //     fontSize: 22,
-                //     fontWeight: FontWeight.bold,
-                //   ),
-                // ),
-                // const SizedBox(height: 10),
-                // const Text(
-                //   "Never a better time than now to start.",
-                //   style: TextStyle(
-                //     fontSize: 14,
-                //     color: Colors.black38,
-                //     fontWeight: FontWeight.bold,
-                //   ),
-                // ),
+                const SizedBox(height: 20),
+                const Text(
+                  "Let's get started",
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  "Never a better time than now to start.",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.black38,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 20),
                 // custom button
                 SizedBox(
@@ -59,7 +59,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               () => Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const HomeScreen(),
+                                  builder: (context) => const ResetScreen(),
                                 ),
                               ),
                             );
