@@ -1,256 +1,256 @@
-import "package:country_picker/country_picker.dart";
-import "package:flutter/material.dart";
-import "package:login_screen/provider/auth_provider.dart";
-import "package:login_screen/widgets/custom_button.dart";
-import "package:provider/provider.dart";
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:smartlist/screens/authentication_screens/sign_up_confirmation_screen.dart';
+import '../../widgets/palatte.dart';
+import '../../widgets/widgets.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController fullNameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  bool agreeToTerms = false;
+class _SignUpScreenState extends State<SignUpScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  Country selectedCountry = Country(
-    phoneCode: "27", // South Africa phone code
-    countryCode: "ZA", // South Africa country code
-    e164Sc: 0,
-    geographic: true,
-    level: 1,
-    name: "South Africa", // Country name
-    example: "South Africa", // Example
-    displayName: "South Africa", // Display name
-    displayNameNoCountryCode: "ZA", // Display name without country code
-    e164Key: "",
-  );
+  // Intialize the text fields
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
+  bool _obscurePassword = true;
+  // show loading icon
+  bool _isLoading = false;
+
+  // Sign up auth method
+  Future<void> _signUpOnPressed(BuildContext context) async {
+    if (_formKey.currentState?.validate() ?? false) {
+      setState(() {
+        _isLoading = true; // Show loading icon
+      });
+      try {
+        final signUpResult = await Amplify.Auth.signUp(
+          username: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+          options: CognitoSignUpOptions(
+            userAttributes: {
+              CognitoUserAttributeKey.email: _emailController.text.trim(),
+              CognitoUserAttributeKey.preferredUsername:
+                  _usernameController.text.trim(),
+              CognitoUserAttributeKey.phoneNumber:
+                  _phoneNumberController.text.trim(),
+            },
+          ),
+        );
+        // debugPrint("Error in signupresult get controller");
+        if (signUpResult.isSignUpComplete) {
+          _goTOSignUpConfirmationScreen(context, _emailController.text.trim());
+          debugPrint("Sign Up done, forwarded to confirm");
+        }
+      } on AuthException catch (e) {
+        debugPrint(e.toString());
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(e.message),
+          duration: const Duration(seconds: 5),
+        ));
+      } finally {
+        setState(() {
+          _isLoading = false; // Hide loading icon
+        });
+      }
+    }
+  }
+
+  void _goTOSignUpConfirmationScreen(BuildContext context, String email) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SignUpConfirmationScreen(
+          email: email,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    phoneController.selection = TextSelection.fromPosition(
-      TextPosition(offset: phoneController.text.length),
-    );
-    return Scaffold(
-        body: SafeArea(
-        child: SingleChildScrollView(
-        child: Center(
-        child: Padding(
-        padding: const EdgeInsets.symmetric(
-        vertical: 25,
-        horizontal: 35,
-    ),
-    child: Column(
-    children: [
-    SizedBox(
-    width: 200,
-    height: 200,
-    child: Image.asset('assets/Grocery_bag.png'),
-    ),
-    const SizedBox(
-    height: 20,
-    ),
-    const Text(
-    "Register",
-    style: TextStyle(
-    fontSize: 22,
-    fontWeight: FontWeight.bold,
-    ),
-    ),
-    const SizedBox(height: 10),
-
-
-                const SizedBox(height: 20),
-                TextFormField(
-                  cursorColor: Colors.purple,
-                  controller: fullNameController,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: "Full Name",
-                    hintStyle: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 15,
-                      color: Colors.grey.shade600,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.black12),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.black12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  cursorColor: Colors.purple,
-                  controller: emailController,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: "Email",
-                    hintStyle: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 15,
-                      color: Colors.grey.shade600,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.black12),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.black12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  cursorColor: Colors.purple,
-                  controller: passwordController,
-                  obscureText: true,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: "Password",
-                    hintStyle: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 15,
-                      color: Colors.grey.shade600,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.black12),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.black12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  cursorColor: Colors.purple,
-                  controller: phoneController,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      phoneController.text = value;
-                    });
-                  },
-                  decoration: InputDecoration(
-                    hintText: "Enter phone number",
-                    hintStyle: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 15,
-                      color: Colors.grey.shade600,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.black12),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.black12),
-                    ),
-                    prefixIcon: Container(
-                      padding: const EdgeInsets.all(12.0),
-                      child: InkWell(
-                        onTap: () {
-                          showCountryPicker(
-                            context: context,
-                            countryListTheme: const CountryListThemeData(
-                              bottomSheetHeight: 500,
-                            ),
-                            onSelect: (value) {
-                              setState(() {
-                                selectedCountry = value;
-                              });
-                            },
-                          );
-                        },
-                        child: Text(
-                           "${selectedCountry.flagEmoji} +${selectedCountry.phoneCode}",
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
+    return Stack(
+      children: [
+        const BackgroundImage(),
+        Scaffold(
+          key: _scaffoldKey,
+          backgroundColor: Colors.white,
+          body: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    // ignore: sized_box_for_whitespace
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: Container(
+                        height: 200,
+                        child: const Center(
+                          child: Image(
+                            image: AssetImage('assets/images/Grocery_bag.png'),
                           ),
                         ),
                       ),
                     ),
-                    suffixIcon: phoneController.text.length > 9
-                        ? Container(
-                        height: 30,
-                        width: 30,
-
-                        margin: const EdgeInsets.all(10.0),
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.green,
-                        ),
-                        child: const Icon(
-                          Icons.done,
-                          color: Colors.white,
-                          size: 20,
-                        ))
-                        : null,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Checkbox(
-                      value: agreeToTerms,
-                      onChanged: (value) {
-                        setState(() {
-                          agreeToTerms = value!;
-                        });
-                      },
+                    const SizedBox(
+                      height: 20,
                     ),
-                    const Text("Agree to terms and conditions"),
+                    // ignore: avoid_unnecessary_containers
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 30.0,
+                      ),
+                      child: Column(
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              // username Input
+                              TextInput(
+                                icon: Icons.person,
+                                hint: 'Username',
+                                inputType: TextInputType.text,
+                                inputAction: TextInputAction.done,
+                                controller: _usernameController,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                ),
+                                validator: (value) {},
+                                iconSize:
+                                    MediaQuery.of(context).size.width * 0.08,
+                              ),
+
+                              // emailInput
+                              TextInput(
+                                icon: Icons.email,
+                                hint: 'Email',
+                                inputType: TextInputType.emailAddress,
+                                inputAction: TextInputAction.done,
+                                controller: _emailController,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                ),
+                                validator: (value) {},
+                                iconSize:
+                                    MediaQuery.of(context).size.width * 0.08,
+                              ),
+
+                              // phoneNumberInput
+                              TextInput(
+                                icon: Icons.phone,
+                                hint: 'Phone Number +27',
+                                inputType: TextInputType.phone,
+                                inputAction: TextInputAction.done,
+                                controller: _phoneNumberController,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                ),
+                                validator: (value) {},
+                                iconSize:
+                                    MediaQuery.of(context).size.width * 0.08,
+                              ),
+
+                              // passwordInput
+                              TextInput(
+                                icon: Icons.lock,
+                                hint: 'Password',
+                                inputType: TextInputType.text,
+                                inputAction: TextInputAction.done,
+                                controller: _passwordController,
+                                obscure: _obscurePassword,
+                                suffix: IconButton(
+                                  color: Colors.white,
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscurePassword = !_obscurePassword;
+                                    });
+                                  },
+                                ),
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                ),
+                                validator: (value) {},
+                                iconSize:
+                                    MediaQuery.of(context).size.width * 0.08,
+                              ),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              const SizedBox(
+                                height: 30,
+                              ),
+                              RoundedButton(
+                                buttonText: 'Sign up',
+                                onPressed: () => _signUpOnPressed(context),
+                                buttonColor: Colors
+                                    .blue, // Provide a default color or specify a MaterialColor
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              Visibility(
+                                visible: _isLoading,
+                                replacement: const SizedBox(
+                                  height: 35,
+                                ),
+                                child: const CircularProgressIndicator(
+                                  color: Colors.green,
+                                ),
+                              ),
+                              Column(
+                                children: [
+                                  Text(
+                                    'Already Have Account?',
+                                    style:
+                                        kBodyText.copyWith(color: Colors.black),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pushNamedAndRemoveUntil(
+                                        context,
+                                        '/sign_in_route',
+                                        ModalRoute.withName('/sign_in_route'),
+                                      );
+                                    },
+                                    child: const Text(
+                                      'Login',
+                                      style: TextStyle(
+                                        color: Colors.green,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize:
+                                            20, // Adjust the value as needed
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    )
                   ],
                 ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: CustomButton(
-                    text: "Register",
-                    onPressed: () => sendPhoneNumberAndVerify(),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),
-      ),
-    )
-    );
-  }
-
-  void sendPhoneNumberAndVerify() {
-    final ap = Provider.of<AuthProvider>(context, listen: false);
-    String phoneNumber = phoneController.text.trim();
-    ap.signInWithPhone(
-      context,
-      "+${selectedCountry.phoneCode}$phoneNumber",
+      ],
     );
   }
 }
