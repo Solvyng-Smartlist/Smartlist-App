@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:smartlist/screens/model_screens/home.dart';
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({Key? key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -10,14 +12,14 @@ class HomeScreen extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              _buildRoundedCard("Product", null), // No image for the first card
+              _buildRoundedCard("discount", 'assets/images/card1.png'),
               _buildRoundedCardWithNavigation(
                   context,
                   "Category",
                   'assets/images/Category.png',
-                  Category()), // Navigate to CategoryPage
-              _buildRoundedCard("Recipe", 'assets/images/recipe.jpg'),
-              _buildRoundedCard("Beverages", 'assets/images/Beverages.jpg'),
+                  const Category()), // Navigate to CategoryPage
+              _buildRoundedCard("List", 'assets/images/CreateList.png'),
+              _buildRoundedCard("Recipe", 'assets/images/Recipe 1.jpg'),
             ],
           ),
         ),
@@ -88,6 +90,53 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
+class SliderScreen extends StatelessWidget {
+  final Category category;
+
+  const SliderScreen({
+    required this.category,
+  });
+
+  get fit => null;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(
+        horizontal: 5.0,
+        vertical: 20,
+      ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.all(Radius.circular(5.0)),
+        child: Stack(
+          children: <Widget>[
+            _buildRoundedCard("discount", 'assets/images/card1.png'),
+            _buildRoundedCard("discount", 'assets/images/card2.png'),
+            _buildRoundedCard("discount", 'assets/images/card3.png'),
+            Positioned(
+              bottom: 0.0,
+              left: 0.0,
+              right: 0.0,
+              child: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [], // Add your gradient colors here
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+_buildRoundedCard(String s, String t) {}
+
+
 // class CategoryPage extends StatelessWidget {
 //   @override
 //   Widget build(BuildContext context) {
@@ -99,5 +148,4 @@ class HomeScreen extends StatelessWidget {
 //         child: Text("This is the Category Page."),
 //       ),
 //     );
-//   }
-// }
+// }  }
