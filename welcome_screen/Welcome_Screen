@@ -1,23 +1,47 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:login_screen/screens/register_screen.dart';
-import 'package:login_screen/screens/reset_password.dart';
-import 'package:login_screen/widgets/custom_button.dart';
-import 'package:provider/provider.dart';
 
-import '../provider/auth_provider.dart';
+import 'authentication_screens/sign_in_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
-  const WelcomeScreen({super.key});
+  const WelcomeScreen({Key? key});
 
   @override
   State<WelcomeScreen> createState() => _WelcomeScreenState();
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
+  bool isLoading = false;
+
+  Future<void> signInWithAmplify() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final authResult = await Amplify.Auth.signInWithWebUI();
+      if (authResult.isSignedIn) {
+        // Successfully signed in, navigate to your HomeScreen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const SignInScreen(),
+          ),
+        );
+      } else {
+        // Handle sign-in failure
+      }
+    } catch (e) {
+      // Handle sign-in error
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final ap = Provider.of<AuthProvider>(context, listen: false);
-
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -27,7 +51,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
-                  "assets/Grocery_bag.png",
+                  "assets/images/Grocery_bag.png",
                   height: 300,
                 ),
                 const SizedBox(height: 20),
@@ -36,43 +60,33 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
+                    color: Colors.green,
                   ),
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  "Never a better time than now to start.",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black38,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
                 const SizedBox(height: 20),
-                // custom button
                 SizedBox(
                   width: double.infinity,
                   height: 50,
-                  child: CustomButton(
-                    onPressed: () async {
-                      if (ap.isSignedIn == true) {
-                        await ap.getDataFromSP().whenComplete(
-                              () => Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const ResetScreen(),
-                                ),
-                              ),
-                            );
-                      } else {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const RegisterScreen(),
-                          ),
-                        );
-                      }
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Navigate to HomeScreen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SignInScreen()),
+                      );
                     },
-                    text: "Get started",
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.green),
+                    ),
+                    child: const Text(
+                      "Get started",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                      ),
+                    ),
                   ),
                 )
               ],
